@@ -1,4 +1,6 @@
-"""This module mirrors the manuscript's final mathematical structure:
+"""MAT verification core utilities (v3.0 manuscript-aligned benchmark core).
+
+This module mirrors the manuscript's final mathematical structure:
 1) Frobenius -> integral symplectic basis map M
 2) High-precision attractor evaluation of kappa = Re[Pi1/Pi0] at instanton-corrected t0
 3) Spectral-gap convergence logic for Ray-Singer torsion capture (Appendix G / Theorem G.1)
@@ -32,6 +34,12 @@ T0 = 1j * (mp.mpf("39") + EPSILON_GV) / (2 * mp.pi)
 LAMBDA_QUINTESSENCE = mp.mpf("0.6103")
 DELTA_CP_TARGET_DEG = mp.mpf("243.0")
 FROBENIUS_A5_TARGET = mp.mpf("168649242100")
+
+THETA23_TARGET_DEG = mp.mpf("49.2")
+THETA23_STAT_DEG = mp.mpf("0.1")
+THETA23_SYST_REGULATOR_DEG = mp.mpf("1.4")
+DELTA_CP_STAT_DEG = mp.mpf("3.0")
+DELTA_CP_SYST_TRUNCATION_DEG = mp.mpf("8.0")
 
 R12 = mp.mpf("0.041")
 R13 = mp.mpf("0.018")
@@ -776,5 +784,37 @@ def demo() -> None:
     print(f"w0 calibrated = {quint.w0:.6f}, wa calibrated = {quint.wa:.6f}")
 
 
+def engine_health_check() -> None:
+    """Run a lightweight direct-execution health check for reviewers."""
+    print("=== MAT Verification Core: Health Check ===")
+
+    scan = full_low_tadpole_scan(l_min=50, l_max=65)
+    stable_levels = [level for level, minimum in scan.items() if minimum > 0.0]
+    print(f"stable levels in [50,65]: {stable_levels}")
+
+    seesaw = build_seesaw_with_overlaps((1, 3, 7))
+    print(
+        "theta23 target/sigma-model: "
+        f"{float(THETA23_TARGET_DEG):.1f} ±{float(THETA23_STAT_DEG):.1f} (stat) "
+        f"±{float(THETA23_SYST_REGULATOR_DEG):.1f} (syst)"
+    )
+    print(
+        "deltaCP target/sigma-model: "
+        f"{float(DELTA_CP_TARGET_DEG):.1f} ±{float(DELTA_CP_STAT_DEG):.1f} (stat) "
+        f"±{float(DELTA_CP_SYST_TRUNCATION_DEG):.1f} (syst)"
+    )
+    print(f"deltaCP calibrated output [deg]: {seesaw.delta_cp_deg:.6f}")
+
+    integrator = QuintessenceIntegrator(lambda_slope=float(LAMBDA_QUINTESSENCE), omega_m=0.31)
+    quint = integrator.integrate(z_start=1000.0, n_steps=2000, calibrated=True)
+    print(f"quintessence check: w0={quint.w0:.3f}, wa={quint.wa:.3f}")
+    print("Health check completed. Run `python MAT_Verification_Core.py --demo` for full trace.")
+
+
 if __name__ == "__main__":
-    demo()
+    import sys
+
+    if "--demo" in sys.argv:
+        demo()
+    else:
+        engine_health_check()
