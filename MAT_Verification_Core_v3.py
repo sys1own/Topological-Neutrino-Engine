@@ -3,7 +3,9 @@
 
 Archive metadata
 ----------------
-- Repository: https://github.com/sys1own/Topological-Neutrino-Engine
+- Main repo: https://github.com/sys1own/Topological-Neutrino-Engine
+- Core engine (main): https://github.com/sys1own/Topological-Neutrino-Engine/blob/main/MAT_Verification_Core.py
+- Verification script (main): https://github.com/sys1own/Topological-Neutrino-Engine/blob/main/MAT_Verification_Core_v3.py
 - Commit hash: af72c91
 - Package role: reviewer-facing offline verification script for the
   T=59 benchmark (stability scan, PMNS extraction, and thawing outputs).
